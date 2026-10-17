@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapText</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #000f16;
+      --surface: #10232d;
+      --border: #263d48;
+      --text: #f4f7f9;
+      --muted: #a7b6bf;
+      --accent: #36d6a3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      margin: 0;
+      padding: 20px;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 22px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--accent);
+      color: var(--background);
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    button:hover {
+      border-color: var(--accent);
+    }
+
+    .primary {
+      margin-bottom: 10px;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--background);
+      text-align: center;
+    }
+
+    .note {
+      margin: 17px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="brand">
+    <div class="logo">S</div>
+    <div>
+      <h1>SnapText</h1>
+      <p class="subtitle">Capture. Extract. Copy.</p>
+    </div>
+  </header>
+
+  <main>
+    <p class="section-title">Extract text from your screen</p>
+
+    <button class="primary" id="captureVisible">
+      Capture visible tab
+    </button>
+
+    <button id="selectArea">
+      Select an area
+    </button>
+
+    <p class="note">
+      SnapText will process captured images locally.
+      Your screenshots won't need to be uploaded to an OCR server.
+    </p>
+  </main>
+
+  <footer>SnapText Extension · Version 1.0.0</footer>
+
+
+  <script src="src/popup.js"></script>
+
+
+</body>
+</html>

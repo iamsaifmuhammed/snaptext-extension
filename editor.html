@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapText Editor</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #000f16;
+      --surface: #10232d;
+      --surface-hover: #183440;
+      --border: #263d48;
+      --text: #f4f7f9;
+      --muted: #a7b6bf;
+      --accent: #36d6a3;
+      --accent-dark: #06251d;
+      --danger: #ff7777;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--surface-hover);
+      border-color: var(--accent);
+    }
+
+    button:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: #59e4b8;
+    }
+
+    button.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 16px 24px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      flex-shrink: 0;
+      border-radius: 12px;
+      background: var(--accent);
+      color: var(--accent-dark);
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .tagline {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .version {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    main {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      padding: 26px 22px 40px;
+    }
+
+    .page-heading {
+      margin-bottom: 18px;
+    }
+
+    .page-heading h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+    }
+
+    .page-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-bottom: 14px;
+    }
+
+    .status {
+      min-height: 38px;
+      margin-bottom: 18px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .status.success {
+      border-color: #236c55;
+      color: var(--accent);
+    }
+
+    .status.error {
+      border-color: #733c42;
+      color: var(--danger);
+    }
+
+    .workspace {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #071820;
+    }
+
+    .workspace-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workspace-heading h3 {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .image-meta {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .image-stage {
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+      padding: 18px;
+    }
+
+    .image-container {
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      line-height: 0;
+    }
+
+    #preview {
+      display: block;
+      max-width: 100%;
+      max-height: 65vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .selection-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      display: none;
+      cursor: crosshair;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .selection-layer.enabled {
+      display: block;
+    }
+
+    .selection-box {
+      position: absolute;
+      display: none;
+      border: 2px solid var(--accent);
+      background: rgb(54 214 163 / 15%);
+      box-shadow: 0 0 0 9999px rgb(0 0 0 / 38%);
+      pointer-events: none;
+    }
+
+    .empty-state {
+      padding: 30px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .crop-controls {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .crop-controls.visible {
+      display: flex;
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .text-panel {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+
+    .text-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .text-panel-header h3 {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .text-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 160px;
+      resize: vertical;
+      padding: 16px;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    textarea::placeholder {
+      color: #82959e;
+    }
+
+    .panel-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    @media (min-width: 850px) {
+      .lower-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 13px 15px;
+      }
+
+      .version {
+        display: none;
+      }
+
+      main {
+        padding: 20px 12px 28px;
+      }
+
+      .toolbar button {
+        flex: 1 1 42%;
+      }
+
+      .image-stage {
+        min-height: 200px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1>SnapText</h1>
+        <p class="tagline">Capture. Extract. Copy.</p>
+      </div>
+    </div>
+    <div class="version">Browser Extension · v1.0.0</div>
+  </header>
+
+  <main>
+    <section class="page-heading">
+      <h2>Screenshot editor</h2>
+      <p>Copy, save, crop, and prepare your screenshot for text extraction.</p>
+    </section>
+
+    <section class="toolbar" aria-label="Screenshot actions">
+      <button id="recapture">↻ Capture again</button>
+      <button id="copyScreenshot">▣ Copy screenshot</button>
+      <button id="saveScreenshot">↓ Save screenshot</button>
+      <button id="cropScreenshot">⌗ Crop screenshot</button>
+      <label for="ocrLanguage">OCR language:</label>
+      <select id="ocrLanguage" aria-label="OCR language">
+        <option value="eng">English</option>
+        <option value="ben">বাংলা (Bengali)</option>
+        <option value="eng+ben" selected>English + বাংলা</option>
+      </select>
+
+      <button id="extractText" class="primary">Aa Extract text</button>
+    </section>
+
+    <div id="status" class="status" role="status" aria-live="polite">
+      Loading screenshot...
+    </div>
+
+    <section class="workspace">
+      <div class="workspace-heading">
+        <h3>Screenshot preview</h3>
+        <span id="imageMeta" class="image-meta">No image loaded</span>
+      </div>
+
+      <div class="image-stage">
+        <div id="emptyState" class="empty-state" hidden>
+          No screenshot is available.<br>
+          Capture a browser tab using SnapText to get started.
+        </div>
+
+        <div id="imageContainer" class="image-container" hidden>
+          <img id="preview" alt="Current SnapText screenshot">
+
+          <div id="selectionLayer" class="selection-layer">
+            <div id="selectionBox" class="selection-box"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="cropControls" class="crop-controls">
+        <button id="applyCrop" class="primary">Apply crop</button>
+        <button id="cancelCrop">Cancel selection</button>
+        <button id="resetCrop">Reset original</button>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="text-panel">
+        <div class="text-panel-header">
+          <h3>Extracted text</h3>
+          <div class="text-actions">
+            <button id="copyText">Copy text</button>
+            <button id="clearText">Clear</button>
+          </div>
+        </div>
+
+        <textarea
+          id="extractedText"
+          placeholder="Recognized text will appear here. You can also type or edit text here."
+          spellcheck="false"
+        ></textarea>
+
+        <div class="panel-footer">
+          <span id="textCount">0 characters</span>
+          <span>Editable text</span>
+        </div>
+      </div>
+
+      <div class="text-panel">
+        <div class="text-panel-header">
+          <h3>Quick guide</h3>
+        </div>
+        <div style="padding: 16px; color: var(--muted); font-size: 13px; line-height: 1.8;">
+          <p style="margin-top: 0;"><strong>1.</strong> Capture a browser tab.</p>
+          <p><strong>2.</strong> Copy or save the screenshot if needed.</p>
+          <p><strong>3.</strong> Select an area and apply the crop.</p>
+          <p style="margin-bottom: 0;"><strong>4.</strong> Extract text once the local OCR engine is connected.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="src/editor.js"></script>
+</body>
+</html>

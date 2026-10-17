@@ -1,0 +1,14 @@
+﻿Copyright (c) 2026 Saif Muhammed. All rights reserved.
+
+SnapText proprietary software.
+
+Except for third-party components governed by their own licenses,
+no permission is granted to copy, modify, redistribute, sublicense,
+or create derivative works from SnapText's original code or assets.
+
+This notice does not replace or restrict rights granted by applicable
+third-party licenses. Public availability on GitHub does not grant a
+general license to use SnapText's original code outside rights provided
+by applicable law and GitHub's Terms of Service.
+
+For licensing inquiries, contact the repository owner.

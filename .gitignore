@@ -1,0 +1,25 @@
+﻿# Exclude development artifacts and local secrets
+node_modules/
+*.backup
+*.bak
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Windows and editor artifacts
+Desktop.ini
+*.swp
+*.swo
+*.orig
+*.rej
+
+# Build and packaging output
+dist/
+build/
+*.crx
+*.zip
